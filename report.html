@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <script type="text/javascript" src="requests.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        const data = [];
+
+        data.push(['Time', 'Available Requests', 'Successful Requests']);
+
+        for (const request of REQUESTS.requests) {
+          data.push([
+            new Date(request.ts), 
+            Math.ceil(request.newTokens / REQUESTS.tokens), 
+            request.successfulRequests
+          ]);
+        }
+
+        const lineData = google.visualization.arrayToDataTable(data);
+
+        const title = `Token Bucket Demo : Rate ${REQUESTS.rate} - Capacity ${REQUESTS.capacity} - Tokens ${REQUESTS.tokens}`;
+
+        const options = {
+          title,
+          curveType: 'function',
+          vAxis: {
+            title: 'Requests'
+          },
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('requests_chart'));
+
+        google.visualization.events.addListener(chart, 'ready', function () {
+          document.getElementById('image_link').outerHTML = '<a href="' + chart.getImageURI() + '">Printable version</a>';
+        });
+
+        chart.draw(lineData, options);
+      }
+    </script>
+
+    <title>Token Bucket Demo</title>
+  </head>
+  <body>
+    <div id='image_link'></div>
+    <div id="requests_chart" style="height: 900px;width:90%"></div>
+  </body>
+</html>
